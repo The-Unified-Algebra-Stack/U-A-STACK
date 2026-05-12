@@ -5,7 +5,7 @@ A TypeScript library for building deterministic, replayable, and eventually cons
 ## Install
 
 ```bash
-npm install unified-algebra-stack
+npm install unified-algebra-stack@0.1.0
 ```
 
 ## Core idea
