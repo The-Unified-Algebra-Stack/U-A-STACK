@@ -1,0 +1,127 @@
+// examples/code-analysis-flow.json
+
+{
+  "flowId": "code-analysis-001",
+  "version": "1.0",
+  "metadata": {
+    "name": "Code Analysis and Improvement",
+    "description": "Analyze code using Ollama and suggest improvements",
+    "timeout": 60000,
+    "retryPolicy": {
+      "maxAttempts": 2,
+      "backoffMs": 1000
+    }
+  },
+  "config": {
+    "llmProvider": "ollama",
+    "llmModel": "mistral",
+    "temperature": 0.7,
+    "maxTokens": 2048,
+    "topP": 0.9,
+    "topK": 40
+  },
+  "inputs": {
+    "code": {
+      "type": "string",
+      "description": "Source code to analyze",
+      "required": true
+    },
+    "language": {
+      "type": "string",
+      "description": "Programming language",
+      "default": "javascript",
+      "enum": ["javascript", "python", "java", "go", "rust"]
+    }
+  },
+  "outputs": {
+    "analysis": {
+      "type": "object",
+      "source": "steps.format-analysis.output"
+    },
+    "summary": {
+      "type": "string",
+      "source": "steps.generate-summary.output"
+    }
+  },
+  "steps": [
+    {
+      "id": "analyze-code",
+      "type": "llm_call",
+      "llmConfig": {
+        "model": "mistral",
+        "temperature": 0.5,
+        "maxTokens": 1500
+      },
+      "prompt": {
+        "template": "Analyze this {{language}} code and identify:\n1. Potential bugs or issues\n2. Performance problems\n3. Code quality improvements\n4. Best practices that aren't followed\n\nCode:\n```{{language}}\n{{code}}\n```\n\nProvide a detailed technical analysis.",
+        "variables": ["code", "language"]
+      },
+      "outputKey": "analysisText"
+    },
+    {
+      "id": "parse-analysis",
+      "type": "function_call",
+      "function": "parseJson",
+      "inputs": {
+        "json": "{{ steps.analyze-code.output }}"
+      },
+      "outputKey": "parsedAnalysis"
+    },
+    {
+      "id": "extract-issues",
+      "type": "function_call",
+      "function": "extractErrors",
+      "inputs": {
+        "text": "{{ steps.analyze-code.output }}"
+      },
+      "outputKey": "issues"
+    },
+    {
+      "id": "generate-summary",
+      "type": "llm_call",
+      "llmConfig": {
+        "model": "mistral",
+        "temperature": 0.3,
+        "maxTokens": 200
+      },
+      "prompt": {
+        "template": "Summarize this {{language}} code analysis in one paragraph:\n\n{{ steps.analyze-code.output }}",
+        "variables": ["language"]
+      },
+      "outputKey": "summaryText"
+    },
+    {
+      "id": "format-analysis",
+      "type": "function_call",
+      "function": "formatJson",
+      "inputs": {
+        "value": {
+          "codeLength": "{{ inputs.code.length }}",
+          "language": "{{ inputs.language }}",
+          "analysisDetails": "{{ steps.analyze-code.output }}",
+          "issues": "{{ steps.extract-issues.output }}",
+          "summary": "{{ steps.generate-summary.output }}"
+        },
+        "indent": 2
+      },
+      "outputKey": "analysis"
+    }
+  ],
+  "errorHandlers": [
+    {
+      "matchType": "Model not found",
+      "action": "fallback",
+      "fallbackValue": {
+        "analysis": {
+          "error": "Model not available. Make sure to run: ollama pull mistral",
+          "issues": [],
+          "summary": "Analysis failed due to model unavailability"
+        }
+      }
+    },
+    {
+      "matchType": "timeout",
+      "action": "throw"
+    }
+  ]
+}

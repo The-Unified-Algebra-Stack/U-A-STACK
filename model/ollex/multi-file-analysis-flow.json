@@ -1,0 +1,72 @@
+// examples/multi-file-analysis-flow.json
+
+{
+  "flowId": "multi-file-analysis",
+  "version": "1.0",
+  "metadata": {
+    "name": "Multi-File Code Analysis",
+    "description": "Process multiple files in parallel and generate report",
+    "timeout": 120000
+  },
+  "config": {
+    "llmProvider": "ollama",
+    "llmModel": "mistral",
+    "temperature": 0.6,
+    "maxTokens": 1024
+  },
+  "inputs": {
+    "files": {
+      "type": "array",
+      "description": "Array of {path, content, language} objects",
+      "required": true
+    }
+  },
+  "outputs": {
+    "report": {
+      "type": "object",
+      "source": "steps.generate-report.output"
+    }
+  },
+  "steps": [
+    {
+      "id": "analyze-files",
+      "type": "loop",
+      "array": "{{ inputs.files }}",
+      "itemKey": "file",
+      "steps": [
+        {
+          "id": "analyze-single-file",
+          "type": "llm_call",
+          "prompt": {
+            "template": "Analyze {{file.language}} code:\n\n```{{file.language}}\n{{file.content}}\n```\n\nFile: {{file.path}}\n\nProvide JSON with: {issues: [], improvements: [], score: 0-100}"
+          },
+          "outputKey": "fileAnalysis"
+        }
+      ],
+      "outputKey": "allAnalyses"
+    },
+    {
+      "id": "count-files",
+      "type": "function_call",
+      "function": "length",
+      "inputs": {
+        "value": "{{ inputs.files }}"
+      },
+      "outputKey": "fileCount"
+    },
+    {
+      "id": "generate-report",
+      "type": "function_call",
+      "function": "formatJson",
+      "inputs": {
+        "value": {
+          "totalFiles": "{{ steps.count-files.output }}",
+          "analysisTimestamp": "{{ env.TIMESTAMP }}",
+          "fileAnalyses": "{{ steps.analyze-files.output }}",
+          "reportStatus": "complete"
+        }
+      },
+      "outputKey": "report"
+    }
+  ]
+}

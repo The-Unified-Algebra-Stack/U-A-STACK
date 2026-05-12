@@ -1,0 +1,43 @@
+{
+  "name": "unified-algebra-stack",
+  "version": "0.1.0",
+  "description": "Complete implementation of the Unified Algebra Stack specification",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:purity": "jest --testNamePattern='purity'",
+    "test:composition": "jest --testNamePattern='composition'",
+    "test:merge": "jest --testNamePattern='merge'",
+    "test:causal": "jest --testNamePattern='causal'",
+    "lint": "tsc --noEmit",
+    "dev": "tsc --watch"
+  },
+  "keywords": [
+    "algebra",
+    "reducer",
+    "state-management",
+    "crdt",
+    "distributed-systems",
+    "deterministic",
+    "monoid",
+    "event-sourcing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@jest/globals": "^30.4.1",
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "fast-check": "^3.11.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.0"
+  }
+}
