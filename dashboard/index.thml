@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Unified Algebra Stack Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0f172a;
+            --panel: #111827;
+            --panel-light: #1e293b;
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #e5e7eb;
+            --muted: #94a3b8;
+            --green: #22c55e;
+            --amber: #f59e0b;
+            --blue: #3b82f6;
+            --purple: #8b5cf6;
+            --red: #ef4444;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        body {
+            background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .dashboard {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            gap: 24px;
+        }
+
+        .hero {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(14px);
+        }
+
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .hero h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(34, 197, 94, 0.12);
+            color: #86efac;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            padding: 12px 18px;
+            border-radius: 999px;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .pulse {
+            width: 10px;
+            height: 10px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5);
+                opacity: 0.4;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .hero-metrics {
+            margin-top: 28px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 22px;
+        }
+
+        .metric-card span {
+            display: block;
+            color: var(--muted);
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .metric-card h2 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .metric-card small {
+            color: #86efac;
+            font-size: 0.85rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .panel {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .panel h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .subtle {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .timeline-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timeline-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--blue), var(--purple));
+        }
+
+        .timeline-time {
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .timeline-card h4 {
+            margin-bottom: 10px;
+            font-size: 1.05rem;
+        }
+
+        .diff {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 12px;
+            padding: 14px;
+            margin-top: 12px;
+            color: #cbd5e1;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        .verify {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .green {
+            background: rgba(34, 197, 94, 0.12);
+            color: #86efac;
+        }
+
+        .blue {
+            background: rgba(59, 130, 246, 0.12);
+            color: #93c5fd;
+        }
+
+        .amber {
+            background: rgba(245, 158, 11, 0.12);
+            color: #fcd34d;
+        }
+
+        .intent-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .intent-step {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: 18px;
+        }
+
+        .arrow {
+            color: var(--muted);
+            font-size: 1.5rem;
+        }
+
+        .node-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 18px;
+        }
+
+        .node {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            padding: 18px;
+        }
+
+        .node-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+            color: #86efac;
+            font-size: 0.9rem;
+        }
+
+        .assistant {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(139, 92, 246, 0.15));
+            border: 1px solid rgba(139, 92, 246, 0.25);
+        }
+
+        .assistant-box {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 18px;
+            color: #dbeafe;
+            line-height: 1.7;
+        }
+
+        .assistant-input {
+            margin-top: 18px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .assistant-input input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 14px 16px;
+            color: white;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .assistant-input button {
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            border: none;
+            border-radius: 14px;
+            padding: 14px 22px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .footer-note {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.9rem;
+            padding: 10px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
+            .hero {
+                padding: 24px;
+            }
+
+            .hero h1 {
+                font-size: 1.7rem;
+            }
+
+            .intent-flow {
+                flex-direction: column;
+            }
+
+            .arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard">
+
+        <section class="hero">
+            <div class="hero-top">
+                <div>
+                    <h1>Unified Algebra Stack</h1>
+                    <p>
+                        Human-centric deterministic runtime dashboard with replay visibility,
+                        cryptographic integrity, causal state transitions, and distributed synchronization insight.
+                    </p>
+                </div>
+
+                <div class="status-pill">
+                    <div class="pulse"></div>
+                    Runtime Stable
+                </div>
+            </div>
+
+            <div class="hero-metrics">
+                <div class="metric-card">
+                    <span>Verified Transitions</span>
+                    <h2>12,402</h2>
+                    <small>Replay consistent</small>
+                </div>
+
+                <div class="metric-card">
+                    <span>Determinism Score</span>
+                    <h2>100%</h2>
+                    <small>No divergences detected</small>
+                </div>
+
+                <div class="metric-card">
+                    <span>Event Throughput</span>
+                    <h2>4,820/s</h2>
+                    <small>Stable processing load</small>
+                </div>
+
+                <div class="metric-card">
+                    <span>Distributed Nodes</span>
+                    <h2>18</h2>
+                    <small>All synchronized</small>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid-3">
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Current Runtime State</h3>
+                    <span class="subtle">Live snapshot</span>
+                </div>
+
+                <div class="timeline">
+                    <div class="timeline-card">
+                        <h4>Operational Summary</h4>
+                        <p class="subtle">
+                            Runtime healthy. Intent queue processing normally with stable replay consistency.
+                        </p>
+
+                        <div class="diff">
+                            activeSessions: 1,204
+                            <br>
+                            pendingIntents: 12
+                            <br>
+                            replayLatency: 14ms
+                            <br>
+                            checkpointDepth: 12,402
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Intent Pipeline</h3>
+                    <span class="subtle">Effect execution</span>
+                </div>
+
+                <div class="intent-flow">
+                    <div class="intent-step">
+                        <strong>REDUCE</strong>
+                        <p class="subtle">Event accepted</p>
+                    </div>
+
+                    <div class="arrow">→</div>
+
+                    <div class="intent-step">
+                        <strong>INTENTS</strong>
+                        <p class="subtle">Effects generated</p>
+                    </div>
+
+                    <div class="arrow">→</div>
+
+                    <div class="intent-step">
+                        <strong>EXECUTE</strong>
+                        <p class="subtle">Distributed actions</p>
+                    </div>
+
+                    <div class="arrow">→</div>
+
+                    <div class="intent-step">
+                        <strong>VERIFY</strong>
+                        <p class="subtle">Replay confirmed</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Replay Integrity</h3>
+                    <span class="subtle">Audit confidence</span>
+                </div>
+
+                <div class="timeline-card">
+                    <h4>Deterministic Verification</h4>
+
+                    <div class="diff">
+                        replayedCheckpoints: 12,402
+                        <br>
+                        divergences: 0
+                        <br>
+                        hashIntegrity: VALID
+                        <br>
+                        reducerPurity: VERIFIED
+                    </div>
+
+                    <div class="verify">
+                        <div class="tag green">✓ Replay Stable</div>
+                        <div class="tag blue">✓ Hash Linked</div>
+                        <div class="tag amber">0 Pending Repairs</div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <h3>State Transition Timeline</h3>
+                <span class="subtle">Human-readable runtime history</span>
+            </div>
+
+            <div class="timeline">
+
+                <div class="timeline-card">
+                    <div class="timeline-time">12:04:22 PM</div>
+                    <h4>Deposit workflow completed</h4>
+
+                    <p class="subtle">
+                        Runtime processed a deterministic balance update and generated persistence intents.
+                    </p>
+
+                    <div class="diff">
+                        balance: 1000 → 1200
+                        <br>
+                        pendingSettlements: 3 → 2
+                        <br>
+                        intentsGenerated: [LOG, STORE]
+                    </div>
+
+                    <div class="verify">
+                        <div class="tag green">✓ Replay Verified</div>
+                        <div class="tag blue">✓ Hash Valid</div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="timeline-time">12:03:41 PM</div>
+                    <h4>Node synchronization event</h4>
+
+                    <p class="subtle">
+                        Distributed runtime clocks converged after temporary network delay.
+                    </p>
+
+                    <div class="diff">
+                        hlcDrift: 12ms → 2ms
+                        <br>
+                        synchronizedNodes: 17 → 18
+                    </div>
+
+                    <div class="verify">
+                        <div class="tag green">✓ Cluster Healthy</div>
+                    </div>
+                </div>
+
+                <div class="timeline-card">
+                    <div class="timeline-time">12:01:18 PM</div>
+                    <h4>Replay audit completed</h4>
+
+                    <p class="subtle">
+                        Historical execution replay matched canonical state lineage.
+                    </p>
+
+                    <div class="diff">
+                        checkpointsReplayed: 12,402
+                        <br>
+                        replayConsistency: 100%
+                    </div>
+
+                    <div class="verify">
+                        <div class="tag green">✓ Deterministic</div>
+                        <div class="tag blue">✓ Audit Passed</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="grid-3">
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Distributed Nodes</h3>
+                    <span class="subtle">Synchronization topology</span>
+                </div>
+
+                <div class="node-grid">
+                    <div class="node">
+                        <strong>Node-01</strong>
+                        <div class="node-status">
+                            <div class="pulse"></div>
+                            Synchronized
+                        </div>
+                    </div>
+
+                    <div class="node">
+                        <strong>Node-02</strong>
+                        <div class="node-status">
+                            <div class="pulse"></div>
+                            Synchronized
+                        </div>
+                    </div>
+
+                    <div class="node">
+                        <strong>Node-03</strong>
+                        <div class="node-status">
+                            <div class="pulse"></div>
+                            Drift 2ms
+                        </div>
+                    </div>
+
+                    <div class="node">
+                        <strong>Node-04</strong>
+                        <div class="node-status">
+                            <div class="pulse"></div>
+                            Healthy
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Hash Chain Integrity</h3>
+                    <span class="subtle">Checkpoint lineage</span>
+                </div>
+
+                <div class="diff">
+                    checkpoint-12400
+                    <br>
+                    ↓
+                    <br>
+                    checkpoint-12401
+                    <br>
+                    ↓
+                    <br>
+                    checkpoint-12402
+                </div>
+
+                <div class="verify" style="margin-top:20px;">
+                    <div class="tag green">No tampering detected</div>
+                </div>
+            </div>
+
+            <div class="panel assistant">
+                <div class="panel-header">
+                    <h3>AI Runtime Assistant</h3>
+                    <span class="subtle">Operational explainability</span>
+                </div>
+
+                <div class="assistant-box">
+                    "Checkpoint 12402 changed because a validated deposit event triggered a deterministic reducer transition. Two intents were emitted: STORE and LOG. Replay verification confirmed identical state reproduction across all synchronized nodes."
+                </div>
+
+                <div class="assistant-input">
+                    <input type="text" placeholder="Ask why a state transition occurred...">
+                    <button>Analyze</button>
+                </div>
+            </div>
+
+        </section>
+
+        <div class="footer-note">
+            Unified Algebra Stack • Human-Centric Deterministic Runtime Interface
+        </div>
+
+    </div>
+
+</body>
+
+</html>
